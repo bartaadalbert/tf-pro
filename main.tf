@@ -31,28 +31,15 @@ module "github_repository" {
   public_key_openssh_title = "flux1"
 }
 
-resource "null_resource" "wait_for_kind_config" {
-  depends_on = [module.kind_cluster]
-
-  provisioner "local-exec" {
-    command = <<-EOT
-      while [ ! -f ${module.kind_cluster.kubeconfig} ]; do
-        echo "Waiting for kind-config to be created..."
-        sleep 2
-      done
-    EOT
-    interpreter = ["bash", "-c"]
-  }
-}
-
 module "flux_bootstrap" {
   # source            = "github.com/den-vasyliev/tf-fluxcd-flux-bootstrap"
   source            = "github.com/bartaadalbert/tf-fluxcd-flux-bootstrap"
   github_repository = "${var.GITHUB_OWNER}/${var.FLUX_GITHUB_REPO}"
+  github_token      = "${var.GITHUB_TOKEN}"
   private_key       = module.tls_private_key.private_key_pem
   config_path       = module.kind_cluster.kubeconfig
-  dummy_input       = null_resource.wait_for_kind_config.id
 }
+
 module "tls_private_key" {
   source    = "github.com/den-vasyliev/tf-hashicorp-tls-keys"
   algorithm = "RSA"
