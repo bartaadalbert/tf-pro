@@ -49,7 +49,7 @@ module "flux_bootstrap" {
 
 Clone this repository and navigate to its directory:
 
-git clone https://github.com/bartaadalbert/tf-pro?ref=kind_kubeconfig
+git clone --branch kind_kubeconfig https://github.com/bartaadalbert/tf-pro
 cd tf-pro
 
 Initialize Terraform:
