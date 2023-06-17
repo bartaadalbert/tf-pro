@@ -1,7 +1,7 @@
 module "kind_cluster" {
 
-  #KIND CLUSERT KUBECONFIG SOURCE GET
-  source            = "github.com/bartaadalbert/tf-kind-cluster"
+  #KIND CLUSTER CERTS SOURCE GET
+  source            = "github.com/bartaadalbert/tf-kind-cluster?ref=cert"
 
   KIND_CLUSTER_NAME = var.KIND_CLUSTER_NAME
   NUM_MASTERS       = var.NUM_MASTERS
@@ -25,15 +25,17 @@ module "github_repository" {
 
 module "flux_bootstrap" {
 
-  #KUBECONFIG SOURCE EXAMPLE
-  source            = "github.com/bartaadalbert/tf-fluxcd-flux-bootstrap"
-  
+  #KIND CERTS SOURCE EXAMPLE
+  source            = "github.com/bartaadalbert/tf-fluxcd-flux-bootstrap?ref=kind"
+
   github_repository = "${var.GITHUB_OWNER}/${var.FLUX_GITHUB_REPO}"
   github_token      = var.GITHUB_TOKEN
   private_key       = module.tls_private_key.private_key_pem
 
-  #KUBECONFIG FILE
-  config_path       = module.kind_cluster.kubeconfig
-
+  #KIND CERTS SOURCE
+  config_host       = module.kind_cluster.endpoint
+  config_client_key = module.kind_cluster.client_key
+  config_ca         = module.kind_cluster.ca
+  config_crt        = module.kind_cluster.crt
 }
 
