@@ -36,7 +36,7 @@ variable "GITHUB_TOKEN" {
 
 variable "FLUX_GITHUB_REPO" {
   type        = string
-  default     = "kbot"
+  default     = "kboti"
   description = "Repo sync with flux"
 }
 
@@ -63,5 +63,3 @@ variable "TG_BOT_TOKEN" {
   description = "TG bot token"
   sensitive   = true  # This will prevent the token from being shown in the CLI output
 }
-
-
