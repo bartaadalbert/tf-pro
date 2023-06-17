@@ -52,7 +52,7 @@ module "flux_bootstrap" {
 
 Clone this repository and navigate to its directory:
 
-git clone https://github.com/bartaadalbert/tf-pro?ref=kind_cert
+git clone --branch kind_cert https://github.com/bartaadalbert/tf-pro
 cd tf-pro
 
 Initialize Terraform:
