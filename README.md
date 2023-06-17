@@ -1,4 +1,4 @@
-Terraform GitOps Infrastructure with Kind, Flux, and GitHub (Kubeconfig)
+# Terraform GitOps Infrastructure with Kind, Flux, and GitHub (Kubeconfig)
 
 This project is a collection of Terraform modules to set up GitOps infrastructure in a local Kubernetes cluster using Kind and Flux, integrated with a GitHub repository. In this version, we use a kubeconfig file instead of certificates to connect to the Kubernetes cluster.
 Modules
