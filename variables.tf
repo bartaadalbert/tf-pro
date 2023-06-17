@@ -36,7 +36,7 @@ variable "GITHUB_TOKEN" {
 
 variable "FLUX_GITHUB_REPO" {
   type        = string
-  default     = "kbot"
+  default     = "kbot-control"
   description = "Repo sync with flux"
 }
 
