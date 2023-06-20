@@ -23,3 +23,5 @@ Remember to protect sensitive information, such as tokens and private keys. Do n
 If you wish to see the content of the kubeconfig file or its path, you can check the respective outputs with `terraform output kubeconfig_content` or `terraform output kubeconfig_path`. Be aware that the actual content of the kubeconfig file is sensitive and it's advisable not to print it in an unsecured environment.
 
 Finally, to destroy the resources created by this configuration, you can use `terraform destroy`.
+
+![CI/CD Workflow](./img/FLUXCD.png)
