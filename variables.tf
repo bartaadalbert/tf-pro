@@ -36,7 +36,7 @@ variable "GITHUB_TOKEN" {
 
 variable "FLUX_GITHUB_REPO" {
   type        = string
-  default     = "kbot-control"
+  default     = "kbot-control-gke"
   description = "Repo sync with flux"
 }
 
@@ -55,7 +55,7 @@ variable "NUM_MASTERS" {
 variable "NUM_WORKERS" {
   description = "Number of worker nodes."
   type        = number
-  default     = 2
+  default     = 1
 }
 
 variable "TG_BOT_TOKEN" {
@@ -64,4 +64,52 @@ variable "TG_BOT_TOKEN" {
   sensitive   = true  # This will prevent the token from being shown in the CLI output
 }
 
+variable "namespace" {
+  type        = string
+  description = "namspace for app"
+  default     = "default"
+}
+
+variable "secret_name" {
+  description = "The name of the secret"
+  type        = string
+  default     = "kbot"
+}
+
+
+variable "kms_key_ring" {
+  description = "The name of the KMS key ring"
+  type        = string
+  default     = "sops-flux-1"
+}
+
+variable "kms_crypto_key" {
+  description = "The name of the KMS crypto key"
+  type        = string
+  default     = "sops-key-flux-1"
+}
+
+variable "secrets" {
+  description = "Map of secret names and key-value pairs"
+  type        = map(map(string))
+  default     = {}
+}
+
+variable "sops_version" {
+  description = "The version of SOPS to download"
+  type        = string
+  default     = "v3.7.3"
+}
+
+variable "sops_os" {
+  description = "The target operating system for SOPS"
+  type        = string
+  default     = "linux"
+}
+
+variable "sops_arch" {
+  description = "The target architecture for SOPS"
+  type        = string
+  default     = "amd64"
+}
 

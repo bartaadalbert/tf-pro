@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Secret
+metadata:
+    name: kbot
+    namespace: demo
+type: Opaque
+data:
+    telegramToken: ENC[AES256_GCM,data:HSs7PEhHnVxdKTAnbdNgJF8f54sQVuhz/G0lmaUcDziMe/ZiSNIbX6qb4I1BTqdrhJD7lly3Kvs0cMkKcS7dpg==,iv:2seKWEEUU7m2ZRrzmi6SHuYMR5UECP5RQQA445wy5tM=,tag:Dj3eYgp5BkbkZfLEqfUyMQ==,type:str]
+sops:
+    kms: []
+    gcp_kms:
+        - resource_id: projects/devopsgo-385622/locations/global/keyRings/sops-flux-1/cryptoKeys/sops-key-flux-1
+          created_at: "2023-07-03T18:18:54Z"
+          enc: CiQAa4gdk0i+zdyCKdyUxOGsQRH15N/LTCVxRQWJEuMFrhh4qCgSSQAAjs4k2aRHsZU/9jNk+n5PA6NzWi7k+vVAvXvr6zU3Z1g+v1U1bQPXGm70UStL3exnONumzJ1RRXKSPBzJBRYvgp2r8N/PPWo=
+    azure_kv: []
+    hc_vault: []
+    age: []
+    lastmodified: "2023-07-03T18:18:55Z"
+    mac: ENC[AES256_GCM,data:eNOKXsHLy31wtJdSJr04RXgfc3XqMZyUTP67lGvdbv4gkloI1jFIk4Vd61CeTwZTiMuBxbnQRGH0A+hR/4s1gQL3ObtAT7EqEWXOik8ec8oW4I2r1G67jDysaftlYfgSHEYHACksMD9UioA54m0PQ596NoaCxSxSjMOkQIR1bsY=,iv:H9o9fzn4Plpdbk3f2bdndheBVpkJ1wMVSQy6C5HAzxY=,tag:NQC1VaL9Wi8QGmTdp+fRFg==,type:str]
+    pgp: []
+    encrypted_regex: ^(telegramToken)$
+    version: 3.7.3
