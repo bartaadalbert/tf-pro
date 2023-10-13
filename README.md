@@ -39,7 +39,7 @@ module "github_repository" {
   public_key_openssh_title = "terra_deploy_key"
 }
 
-Flux Bootstrap: This module bootstraps Flux (the GitOps Kubernetes operator) in your Kind cluster and connects it to your GitHub repository. By default, it uses the kubeconfig file for connectivity, but it can also be configured to use certificates.
+Flux Bootstrap: This module bootstraps Flux (the GitOps Kubernetes operator) in your K3d cluster and connects it to your GitHub repository. By default, it uses the kubeconfig file for connectivity, but it can also be configured to use certificates.
 
 module "flux_bootstrap" {
   source            = "github.com/bartaadalbert/tf-fluxcd-flux-bootstrap"
@@ -47,6 +47,20 @@ module "flux_bootstrap" {
   github_token      = var.GITHUB_TOKEN
   private_key       = module.tls_private_key.private_key_pem
   config_path       = module.kind_cluster.kubeconfig
+}
+
+ArgoCD bootstrap
+module "argocd_bootstrap" {
+  source                  = "github.com/bartaadalbert/tf-argocd-bootstrap?ref=master"
+  github_repository       = "${var.GITHUB_OWNER}/${var.ARGO_GITHUB_REPO}"
+  private_key             = module.tls_private_key.private_key_pem
+  kubeconfig              = module.k3d_cluster.kubeconfig
+  app_name                = var.app_name
+  destination_namespace   = var.destination_namespace
+  project_path            = var.project_path
+  project_targetRevision  = var.project_targetRevision
+  admin_password          = "$2a$12$DM0giBMMw05FA9PeyEjJxuUaVpPx0AeVqxNq.B0jVWGSummn4MthW/n6"
+  patch_argocd_password   = true
 }
 ```
 # Usage
