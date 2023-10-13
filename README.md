@@ -67,7 +67,7 @@ module "argocd_bootstrap" {
 
 Clone this repository and navigate to its directory:
 
-git clone https://github.com/bartaadalbert/tf-pro
+git clone -b argocd https://github.com/bartaadalbert/tf-pro
 cd tf-pro
 
 Initialize Terraform:
