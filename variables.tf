@@ -40,9 +40,21 @@ variable "FLUX_GITHUB_REPO" {
   description = "Repo sync with flux"
 }
 
+variable "ARGO_GITHUB_REPO" {
+  type        = string
+  default     = "webthecars"
+  description = "Repo sync with argo"
+}
+
 variable "KIND_CLUSTER_NAME" {
   type        = string
   default     = "kbot-cluster"
+  description = "My local kind cluster name"
+}
+
+variable "K3D_CLUSTER_NAME" {
+  type        = string
+  default     = "devops-cluster"
   description = "My local kind cluster name"
 }
 
@@ -58,10 +70,27 @@ variable "NUM_WORKERS" {
   default     = 2
 }
 
-variable "TG_BOT_TOKEN" {
+variable "app_name" {
+  description = "Name of the application"
   type        = string
-  description = "TG bot token"
-  sensitive   = true  # This will prevent the token from being shown in the CLI output
+  default     = "appname"
 }
 
+variable "project_targetRevision" {
+  description = "Target revision for the application"
+  type        = string
+  default     = "develop"
+}
+
+variable "project_path" {
+  description = "Path to the application within the repository"
+  type        = string
+  default     = "helm"
+}
+
+variable "destination_namespace" {
+  description = "Namespace on the destination cluster"
+  type        = string
+  default     = "devops-net"
+}
 

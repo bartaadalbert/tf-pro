@@ -1,16 +1,22 @@
-# Terraform GitOps Infrastructure with Kind, Flux, and GitHub
+# Terraform GitOps Infrastructure with Kind,K3D,Flux,ArgoCD and GitHub
 
-This project is a collection of Terraform modules that sets up a GitOps infrastructure on a local Kubernetes cluster using Kind and Flux, integrated with a GitHub repository. By default, we use the kubeconfig file for connectivity. However, the project can also be configured to use certificates.
+This project is a collection of Terraform modules that sets up a GitOps infrastructure on a local Kubernetes cluster using Kind,K3D,Flux,ArgoCD integrated with a GitHub repository. By default, we use the kubeconfig file for connectivity. However, the project can also be configured to use certificates.
 Modules
 
 The project comprises the following modules:
 
-    Kind Cluster: This module sets up a local Kubernetes cluster using Kind (Kubernetes in Docker). By default, it uses a kubeconfig file for connectivity, but it can also be configured to use certificates.
+    This module sets up a local Kubernetes cluster using K3D, which allows you to run K3s (a lightweight Kubernetes distribution) within Docker. The module by default leverages a kubeconfig file for connectivity, though it also supports utilizing certificates if configured.
+    - Kind Cluster: Establishes a local Kubernetes cluster using Kind.
+    - K3D Cluster: Constructs a local Kubernetes cluster utilizing K3D.
+    - TLS Private Key: Generates a TLS private key for secure communication.
+    - GitHub Repository: Initializes a GitHub repository and sets up the deploy key for Flux.
+    - Flux Bootstrap: Installs and configures Flux in your cluster, connecting it to the specified GitHub repository.
+    - ArgoCD Bootstrap: Sets up ArgoCD and links it with your repository for GitOps deployments.
 
 ```hcl
-module "kind_cluster" {
-  source            = "github.com/bartaadalbert/tf-kind-cluster"
-  KIND_CLUSTER_NAME = var.KIND_CLUSTER_NAME
+module "k3d_cluster" {
+  source            = "github.com/bartaadalbert/tf-3d-cluster"
+  K3D_CLUSTER_NAME  = var.K3D_CLUSTER_NAME
   NUM_MASTERS       = var.NUM_MASTERS
   NUM_WORKERS       = var.NUM_WORKERS
 }
@@ -30,7 +36,7 @@ module "github_repository" {
   github_token             = var.GITHUB_TOKEN
   repository_name          = var.FLUX_GITHUB_REPO
   public_key_openssh       = module.tls_private_key.public_key_openssh
-  public_key_openssh_title = "flux_deploy_key"
+  public_key_openssh_title = "terra_deploy_key"
 }
 
 Flux Bootstrap: This module bootstraps Flux (the GitOps Kubernetes operator) in your Kind cluster and connects it to your GitHub repository. By default, it uses the kubeconfig file for connectivity, but it can also be configured to use certificates.
