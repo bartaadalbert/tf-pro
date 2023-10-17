@@ -20,8 +20,24 @@ module "github_repository" {
   github_token             = var.GITHUB_TOKEN
   repository_name          = var.FLUX_GITHUB_REPO
   public_key_openssh       = module.tls_private_key.public_key_openssh
-  public_key_openssh_title = "terra_deploy_key"
+  public_key_openssh_title = "flux_deploy_key"
 }
+
+
+module "tls_private_key_argo" {
+  source    = "github.com/bartaadalbert/tf-tls-keys?ref=master"
+  algorithm = "RSA"
+}
+
+module "github_repository_argo" {
+  source                   = "github.com/bartaadalbert/tf-github-repository?ref=develop"
+  github_owner             = var.GITHUB_OWNER
+  github_token             = var.GITHUB_TOKEN
+  repository_name          = var.ARGO_GITHUB_REPO
+  public_key_openssh       = module.tls_private_key_argo.public_key_openssh
+  public_key_openssh_title = "argo_deploy_key"
+}
+
 
 module "flux_bootstrap" {
 
@@ -35,16 +51,39 @@ module "flux_bootstrap" {
 
 }
 
-  module "argocd_bootstrap" {
-      source                  = "github.com/bartaadalbert/tf-argocd-bootstrap?ref=master"
-      github_repository       = "${var.GITHUB_OWNER}/${var.ARGO_GITHUB_REPO}"
-      private_key             = module.tls_private_key.private_key_pem
-      kubeconfig              = module.k3d_cluster.kubeconfig
-      app_name                = var.app_name
-      destination_namespace   = var.destination_namespace
-      project_path            = var.project_path
-      project_targetRevision  = var.project_targetRevision
-      #pass Argoadmin
-      admin_password          = "$2a$12$DM0giBMMw05FA9PeyEjJxuUaVpPx0AeVqxNq.B0jVWGSummn4MthW/n6"
-      patch_argocd_password   = true
-  }
+module "argocd_bootstrap" {
+  source                  = "github.com/bartaadalbert/tf-argocd-bootstrap?ref=master"
+  github_repository       = "${var.GITHUB_OWNER}/${var.ARGO_GITHUB_REPO}"
+  private_key             = module.tls_private_key_argo.private_key_pem
+  kubeconfig              = module.k3d_cluster.kubeconfig
+  app_name                = var.app_name
+  destination_namespace   = var.destination_namespace
+  project_path            = var.project_path
+  project_targetRevision  = var.project_targetRevision
+  #pass Argoadmin
+  admin_password          = "$2a$12$DM0giBMMw05FA9PeyEjJxuUaVpPx0AeVqxNq.B0jVWGSummn4MthW/n6"
+  patch_argocd_password   = true
+}
+
+module "sealed_secrets" {
+  source = "github.com/bartaadalbert/tf-sealed-secrets"
+  config_path             = module.k3d_cluster.kubeconfig
+  namespace               = var.destination_namespace
+  secrets                 = var.secrets
+  rsa_bits                = var.rsa_bits
+}
+
+provider "kubectl" {
+  config_path = module.k3d_cluster.kubeconfig
+}
+
+resource "kubectl_manifest" "apply_sealed_secrets" {
+  depends_on = [module.sealed_secrets]
+  yaml_body = module.sealed_secrets.all_encrypted_secrets
+}
+
+resource "local_file" "encrypted_secrets_file" {
+  depends_on = [module.sealed_secrets]
+  content  = module.sealed_secrets.all_encrypted_secrets
+  filename = "${path.module}/all-encrypted-secrets.yaml"
+}

@@ -1,27 +1,3 @@
-variable "GOOGLE_PROJECT" {
-  type        = string
-  default     = "devopsgo-385622"
-  description = "GCP project name"
-}
-
-variable "GOOGLE_REGION" {
-  type        = string
-  default     = "europe-west1-c"
-  description = "region name"
-}
-
-variable "GKE_MACHINE_TYPE" {
-  type        = string
-  default     = "n1-standard-1"
-  description = "Machine type"
-}
-
-variable "GKE_NUM_NODES" {
-  type        = number
-  default     = 1
-  description = "GKE nodes number"
-}
-
 variable "GITHUB_OWNER" {
   type        = string
   default     = "bartaadalbert"
@@ -36,13 +12,13 @@ variable "GITHUB_TOKEN" {
 
 variable "FLUX_GITHUB_REPO" {
   type        = string
-  default     = "kbot-control"
+  default     = "flux-gitops"
   description = "Repo sync with flux"
 }
 
 variable "ARGO_GITHUB_REPO" {
   type        = string
-  default     = "webthecars"
+  default     = "appname"
   description = "Repo sync with argo"
 }
 
@@ -94,3 +70,36 @@ variable "destination_namespace" {
   default     = "devops-net"
 }
 
+variable "rsa_bits" {
+  type        = number
+  default     = 4096
+  description = "the size of the generated RSA key, in bits"
+}
+
+variable "secrets" {
+  description = "Map of secret names, their types, namespaces, and key-value pairs"
+  type = map(object({
+    type      = string
+    namespace = string
+    data      = map(string)
+  }))
+  default = {
+    "ghcrio-pull-secret" = {
+      type      = "kubernetes.io/dockerconfigjson",
+      namespace = "devops-net",
+      data      = {
+        ".dockerconfigjson" = <<EOT
+{
+  "auths": {
+    "ghcr.io": {
+      "username": "bartaadalbert",
+      "password": "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    }
+  }
+}
+EOT
+    }
+  }
+}
+sensitive   = true
+}

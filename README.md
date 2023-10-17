@@ -62,6 +62,15 @@ module "argocd_bootstrap" {
   admin_password          = "$2a$12$DM0giBMMw05FA9PeyEjJxuUaVpPx0AeVqxNq.B0jVWGSummn4MthW/n6"
   patch_argocd_password   = true
 }
+
+Kubeseal
+module "sealed_secrets" {
+  source = "github.com/bartaadalbert/tf-sealed-secrets"
+  config_path             = module.k3d_cluster.kubeconfig
+  namespace               = var.destination_namespace
+  secrets                 = var.secrets
+  rsa_bits                = var.rsa_bits
+}
 ```
 # Usage
 
