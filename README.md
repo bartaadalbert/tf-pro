@@ -1,95 +1,78 @@
-# Terraform GitOps Infrastructure with Kind,K3D,Flux,ArgoCD and GitHub
+# Terraform GitOps Infrastructure: Kind, K3D, Flux, ArgoCD, GitHub, Sealed Secrets, Cert Manager, and Cluster Ingress Issuer
 
-This project is a collection of Terraform modules that sets up a GitOps infrastructure on a local Kubernetes cluster using Kind,K3D,Flux,ArgoCD integrated with a GitHub repository. By default, we use the kubeconfig file for connectivity. However, the project can also be configured to use certificates.
-Modules
+This module allows you to set up a Kubernetes environment with ArgoCD for GitOps deployment, complete with Sealed Secrets for secret management, Cert Manager for certificate management, and Cluster Ingress Issuer for domain routing. It offers an end-to-end solution, from deploying applications using Helm to handling ingress resources seamlessly.
 
-The project comprises the following modules:
+## Prerequisites
 
-    This module sets up a local Kubernetes cluster using K3D, which allows you to run K3s (a lightweight Kubernetes distribution) within Docker. The module by default leverages a kubeconfig file for connectivity, though it also supports utilizing certificates if configured.
-    - Kind Cluster: Establishes a local Kubernetes cluster using Kind.
-    - K3D Cluster: Constructs a local Kubernetes cluster utilizing K3D.
-    - TLS Private Key: Generates a TLS private key for secure communication.
-    - GitHub Repository: Initializes a GitHub repository and sets up the deploy key for Flux.
-    - Flux Bootstrap: Installs and configures Flux in your cluster, connecting it to the specified GitHub repository.
-    - ArgoCD Bootstrap: Sets up ArgoCD and links it with your repository for GitOps deployments.
+- **Virtual Private Server (VPS)**
+  - At least 2 CPUs
+  - At least 4 GB RAM
+  - At least 20 GB SSD
+  
+  > **Recommendation:** Consider using [Netx](https://netx.com.ua/aff.php?aff=456), which offers VPS SSD starting at 5.83$ per month, including KVM and 1 Gbps shared bandwidth.
 
-```hcl
-module "k3d_cluster" {
-  source            = "github.com/bartaadalbert/tf-3d-cluster"
-  K3D_CLUSTER_NAME  = var.K3D_CLUSTER_NAME
-  NUM_MASTERS       = var.NUM_MASTERS
-  NUM_WORKERS       = var.NUM_WORKERS
-}
+- **Private GitHub Repository** with:
+  - Your application's Helm chart
+  - A build system (preferably a Makefile)
+  - A private Docker image registry
 
-TLS Private Key: This module generates a TLS private key.
+- **GoDaddy Domain Registration**:
+  - GoDaddy access key
+  - GoDaddy secret key
 
-module "tls_private_key" {
-  source    = "github.com/den-vasyliev/tf-hashicorp-tls-keys"
-  algorithm = "RSA"
-}
+## Quick Start
 
-GitHub Repository: This module sets up a GitHub repository. It uses the develop branch of the specified repository.
+1. **VPS Setup**: Procure a VPS, preferably from [Netx](https://netx.com.ua/aff.php?aff=456).
 
-module "github_repository" {
-  source                   = "github.com/bartaadalbert/tf-github-repository?ref=develop"
-  github_owner             = var.GITHUB_OWNER
-  github_token             = var.GITHUB_TOKEN
-  repository_name          = var.FLUX_GITHUB_REPO
-  public_key_openssh       = module.tls_private_key.public_key_openssh
-  public_key_openssh_title = "terra_deploy_key"
-}
+2. **Repository Preparation**: Ensure your private repository contains the necessary Helm charts. If leveraging a build system, set up a Makefile or an equivalent.
 
-Flux Bootstrap: This module bootstraps Flux (the GitOps Kubernetes operator) in your K3d cluster and connects it to your GitHub repository. By default, it uses the kubeconfig file for connectivity, but it can also be configured to use certificates.
+3. **Clone and Navigate to the Module**:
 
-module "flux_bootstrap" {
-  source            = "github.com/bartaadalbert/tf-fluxcd-flux-bootstrap"
-  github_repository = "${var.GITHUB_OWNER}/${var.FLUX_GITHUB_REPO}"
-  github_token      = var.GITHUB_TOKEN
-  private_key       = module.tls_private_key.private_key_pem
-  config_path       = module.kind_cluster.kubeconfig
-}
+   ```bash
+   git clone -b argocd https://github.com/bartaadalbert/tf-pro
+   cd tf-pro
+   ```
 
-ArgoCD bootstrap
-module "argocd_bootstrap" {
-  source                  = "github.com/bartaadalbert/tf-argocd-bootstrap?ref=master"
-  github_repository       = "${var.GITHUB_OWNER}/${var.ARGO_GITHUB_REPO}"
-  private_key             = module.tls_private_key.private_key_pem
-  kubeconfig              = module.k3d_cluster.kubeconfig
-  app_name                = var.app_name
-  destination_namespace   = var.destination_namespace
-  project_path            = var.project_path
-  project_targetRevision  = var.project_targetRevision
-  admin_password          = "$2a$12$DM0giBMMw05FA9PeyEjJxuUaVpPx0AeVqxNq.B0jVWGSummn4MthW/n6"
-  patch_argocd_password   = true
-}
+4. **Edit Configuration**:
 
-Kubeseal
-module "sealed_secrets" {
-  source = "github.com/bartaadalbert/tf-sealed-secrets"
-  config_path             = module.k3d_cluster.kubeconfig
-  namespace               = var.destination_namespace
-  secrets                 = var.secrets
-  rsa_bits                = var.rsa_bits
-}
-```
-# Usage
+   Update the provided variables according to your setup.
 
-Clone this repository and navigate to its directory:
+   ```hcl
+   module "k3d_cluster" {
+     source            = "github.com/bartaadalbert/tf-k3d-cluster?ref=kubeconfig"
+     K3D_CLUSTER_NAME  = var.K3D_CLUSTER_NAME
+     NUM_MASTERS       = var.NUM_MASTERS
+     NUM_WORKERS       = var.NUM_WORKERS
+   }
+   ```
 
-git clone -b argocd https://github.com/bartaadalbert/tf-pro
-cd tf-pro
+   Make sure to adjust other module configurations as necessary.
 
-Initialize Terraform:
-terraform init
+5. **Initialize and Deploy with Terraform**:
 
-Apply the Terraform configuration:
-terraform apply
+   ```bash
+   terraform init
+   terraform apply
+   ```
 
-# Remember to provide the necessary variables (GITHUB_OWNER, GITHUB_TOKEN, FLUX_GITHUB_REPO) as required.
+6. **Deployment Verification**: After Terraform completes, ensure your application is available through the configured domain.
 
-If you want to use certificates instead of a kubeconfig file for connectivity, uncomment the relevant lines in the kind_cluster and flux_bootstrap modules.
-License
+7. **Secrets Management with Sealed Secrets**: Use Sealed Secrets for Kubernetes secrets. They're encrypted and can be stored securely in version control.
 
-This project is licensed under the terms of the MIT license.
+## Important Notes
 
-This README is a starting point and may be expanded to provide more detailed instructions for setting up the environment or using this project. For instance, you might want to explain how to get the necessary inputs, provide more examples of usage, or include instructions for using the setup once it's created
+- Confirm your VPS adheres to the recommended specifications.
+- ArgoCD ensures your Kubernetes state aligns with the Git repository's desired state.
+- Sealed Secrets help encrypt Kubernetes secrets, ensuring their safe storage in version control.
+- The included ingress module assists in domain routing for service accessibility.
+- Provide necessary variables such as `GITHUB_OWNER`, `GITHUB_TOKEN`, and others as needed.
+  
+  If opting for certificates over a kubeconfig file, uncomment the relevant sections in the `k3d_cluster` and other pertinent modules.
+
+## Contributions
+
+Contributions are welcome! If you encounter any issues or have ideas for improvements, feel free to open an issue or submit a pull request.
+
+## License
+
+Licensed under the MIT License.
