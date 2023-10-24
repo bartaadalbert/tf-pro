@@ -1,7 +1,7 @@
 # Terraform GitOps Infrastructure: Kind, K3D, Flux, ArgoCD, GitHub, Sealed Secrets, Cert Manager, and Cluster Ingress Issuer
 
 ## IMAGES
-![Ingress, svc balance](./images/quiz-svc.png.png)
+![Ingress, svc balance](./images/quiz-svc.png)
 
 
 ## Video Demonstration Link
