@@ -62,7 +62,13 @@ module "argocd_bootstrap" {
   project_targetRevision  = var.project_targetRevision
   #pass Argoadmin
   admin_password          = "$2a$12$DM0giBMMw05FA9PeyEjJxuUaVpPx0AeVqxNq.B0jVWGSummn4MthW/n6"
+
+  #We can add cert-mager to argcd and create the issuer
   patch_argocd_password   = true
+  patch_ports             = true
+  install_cert_manager    = true
+  create_cluster_issuer   = true
+  acme_email              = "admin@mydomain.com"
 }
 
 module "sealed_secrets" {
@@ -73,17 +79,34 @@ module "sealed_secrets" {
   rsa_bits                = var.rsa_bits
 }
 
+module "godaddy_dns" {
+  source         = "git@github.com:bartaadalbert/tf-godaddy-A-module"
+  gdd_access_key = var.gdd_access_key
+  gdd_secret_key = var.gdd_secret_key
+  domain         = var.domain
+  subdomain_list = var.subdomain_list
+  public_ip      = "" # Leave empty to auto-fetch current public IP
+}
+
+module "multi_host_ingress" {
+  source = "github.com/bartaadalbert/tf-multi-host-ingress"
+
+  kubeconfig        = module.k3d_cluster.kubeconfig
+  hosts_to_services = var.hosts_to_services
+  annotations       = var.annotations
+}
+
 provider "kubectl" {
   config_path = module.k3d_cluster.kubeconfig
 }
 
 resource "kubectl_manifest" "apply_sealed_secrets" {
   depends_on = [module.sealed_secrets]
-  yaml_body = module.sealed_secrets.all_encrypted_secrets
+  yaml_body  = module.sealed_secrets.all_encrypted_secrets
 }
 
 resource "local_file" "encrypted_secrets_file" {
   depends_on = [module.sealed_secrets]
-  content  = module.sealed_secrets.all_encrypted_secrets
-  filename = "${path.module}/all-encrypted-secrets.yaml"
+  content    = module.sealed_secrets.all_encrypted_secrets
+  filename   = "${path.module}/all-encrypted-secrets.yaml"
 }
