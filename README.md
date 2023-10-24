@@ -1,5 +1,12 @@
 # Terraform GitOps Infrastructure: Kind, K3D, Flux, ArgoCD, GitHub, Sealed Secrets, Cert Manager, and Cluster Ingress Issuer
 
+## Video Link
+[Watch the video here](https://veed.io/view/1ecb8011-85d4-4fe6-9fd6-b7b312c0f9f1)
+
+## Original Repository
+This project was cloned from [this repository](https://github.com/gigo6000/quiz.git).
+
+
 This module allows you to set up a Kubernetes environment with ArgoCD for GitOps deployment, complete with Sealed Secrets for secret management, Cert Manager for certificate management, and Cluster Ingress Issuer for domain routing. It offers an end-to-end solution, from deploying applications using Helm to handling ingress resources seamlessly.
 
 ## Prerequisites
