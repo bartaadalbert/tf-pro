@@ -101,7 +101,6 @@ EOT
     }
   }
 }
-sensitive   = true
 }
 
 variable "gdd_access_key" {
