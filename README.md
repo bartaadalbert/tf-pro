@@ -7,6 +7,9 @@
 ## Video Demonstration Link
 [Watch the video here](https://veed.io/view/1ecb8011-85d4-4fe6-9fd6-b7b312c0f9f1)
 
+## Video CICD Link
+[Watch the video here](https://veed.io/view/d5a9b176-6a72-42b9-aa3d-21d9574bf2eb)
+
 ## Note
 This project was originally cloned from [this repository](https://github.com/gigo6000/quiz.git) to test and validate my module. Everything is working as expected!
 
