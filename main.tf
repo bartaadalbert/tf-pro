@@ -105,8 +105,30 @@ resource "kubectl_manifest" "apply_sealed_secrets" {
   yaml_body  = module.sealed_secrets.all_encrypted_secrets
 }
 
+#You can store this file in public
 resource "local_file" "encrypted_secrets_file" {
   depends_on = [module.sealed_secrets]
   content    = module.sealed_secrets.all_encrypted_secrets
   filename   = "${path.module}/all-encrypted-secrets.yaml"
+}
+
+#Generated ingress files
+resource "local_file" "ingress_output_file" {
+  depends_on = [module.multi_host_ingress]
+  content    = module.multi_host_ingress.all_ingress_output_yaml
+  filename   = "${path.module}/all-ingress-output.yaml"
+}
+
+#Share this public key for others to encrypt data with kubeseal
+resource "local_file" "sealed_secrets_file" {
+  depends_on = [module.sealed_secrets]
+  content    = module.sealed_secrets.public_key_pem
+  filename   = "${path.module}/public.pem"
+}
+
+#Argo admin random pass, patch_argocd_password = false"
+resource "local_file" "argo_admin_pass" {
+  depends_on = [module.argocd_bootstrap]
+  content    = module.argocd_bootstrap.argo_admin_pass
+  filename   = "${path.module}/argo-admin-pass.txt"
 }
