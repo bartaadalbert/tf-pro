@@ -80,7 +80,7 @@ module "sealed_secrets" {
 }
 
 module "godaddy_dns" {
-  source         = "git@github.com:bartaadalbert/tf-godaddy-A-module"
+  source         = "github.com/bartaadalbert/tf-godaddy-A-module"
   gdd_access_key = var.gdd_access_key
   gdd_secret_key = var.gdd_secret_key
   domain         = var.domain
